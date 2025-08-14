@@ -1,124 +1,145 @@
-def preprocess_text(text):
-    return "".join(filter(str.isalpha, text)).upper()
+Plain_Text = "the house is being sold tonight"
 
+# Vigenère Cipher Encryption
+def Vignere(P, k):
+    """
+    Encrypts a plaintext string using the Vigenère cipher.
 
-def char_to_int(char):
-    return ord(char) - ord('A')
+    Args:
+        P (str): The plaintext message.
+        k (str): The keyword for encryption.
 
-
-def int_to_char(integer):
-    return chr(integer + ord('A'))
-
-
-# Vigenère Cipher
-def vigenere_encrypt(plaintext, key):
-    pt = preprocess_text(plaintext)
-    key = preprocess_text(key)
-    ciphertext = ""
-    for i in range(len(pt)):
-        p = char_to_int(pt[i])
-        k = char_to_int(key[i % len(key)])
-        c = (p + k) % 26
-        ciphertext += int_to_char(c)
-    return ciphertext
-
-
-def vigenere_decrypt(ciphertext, key):
-    key = preprocess_text(key)
-    plaintext = ""
-    for i in range(len(ciphertext)):
-        c = char_to_int(ciphertext[i])
-        k = char_to_int(key[i % len(key)])
-        p = (c - k) % 26
-        plaintext += int_to_char(p)
-    return plaintext
-
-
-# Autokey Cipher
-def autokey_encrypt(plaintext, initial_key_val):
-    pt = preprocess_text(plaintext)
-    ciphertext = ""
-    for i in range(len(pt)):
-        p = char_to_int(pt[i])
-        if i == 0:
-            k = initial_key_val
+    Returns:
+        str: The encrypted ciphertext.
+    """
+    Cipher_text = ""
+    index = 0
+    # Extend the keyword to match the length of the plaintext
+    k = k * (len(P) // len(k) + 1)
+    for char in P:
+        if (char.isalpha()):
+            n = ord(char)
+            # Calculate the shift based on the current key character
+            to_add = ord(k[index].lower()) - ord('a')
+            index += 1
+            if (char.islower()):
+                n += to_add
+                if (n > ord('z')):
+                    n -= 26
+            else: # char is uppercase
+                n += to_add
+                if (n > ord('Z')):
+                    n -= 26
+            Cipher_text += chr(n)
         else:
-            k = char_to_int(pt[i - 1])
-        c = (p + k) % 26
-        ciphertext += int_to_char(c)
-    return ciphertext
+            Cipher_text += char
+    # Remove spaces for the final output
+    Cipher_text = Cipher_text.replace(" ", "")
+    return Cipher_text
 
+# Vigenère Cipher Decryption
+def vignere_decode(P, k):
+    """
+    Decrypts a ciphertext string using the Vigenère cipher.
 
-def autokey_decrypt(ciphertext, initial_key_val):
-    plaintext = ""
-    for i in range(len(ciphertext)):
-        c = char_to_int(ciphertext[i])
-        if i == 0:
-            k = initial_key_val
+    Args:
+        P (str): The ciphertext to decrypt.
+        k (str): The keyword used for encryption.
+    """
+    Cipher_text = ""
+    index = 0
+    # Extend the keyword to match the length of the ciphertext
+    k = k * (len(P) // len(k) + 1)
+    for char in P:
+        if (char.isalpha()):
+            n = ord(char)
+            # Calculate the inverse shift based on the current key character
+            to_add = ord(k[index].lower()) - ord('a')
+            index += 1
+            if (char.islower()):
+                n -= to_add
+                if (n < ord('a')):
+                    n += 26
+            else: # char is uppercase
+                n -= to_add
+                if (n < ord('A')):
+                    n += 26
+            Cipher_text += chr(n)
         else:
-            k = char_to_int(plaintext[i - 1])
-        p = (c - k) % 26
-        plaintext += int_to_char(p)
-    return plaintext
+            Cipher_text += char
+    print(Cipher_text)
 
+# Autokey Cipher Encryption
+def autokey(P, key):  # key is an integer representing the first character of the key
+    """
+    Encrypts a plaintext string using the Autokey cipher.
 
-# --- MENU ---
-def menu():
-    while True:
-        print("\n==== Cipher Menu ====")
-        print("1. Vigenère Cipher")
-        print("2. Autokey Cipher")
-        print("3. Exit")
+    Args:
+        P (str): The plaintext message.
+        key (int): The starting key value (0-25).
 
-        choice = input("Choose an option (1-3): ").strip()
+    Returns:
+        str: The encrypted ciphertext.
+    """
+    if (P[0].islower()):
+        add = 'a'
+    else:
+        add = 'A'
+    # The autokey is formed by the initial key character followed by the plaintext itself
+    k = chr(key + ord(add)) + P
+    # Remove spaces from the key
+    k = k.replace(" ", "")
+    # Use the Vigenère encryption function with the newly generated autokey
+    return (Vignere(P, k))
 
-        if choice == '1':
-            print("\n--- Vigenère Cipher ---")
-            text = input("Enter your message: ")
-            key = input("Enter the key (letters only): ")
-            operation = input("Encrypt or Decrypt? (e/d): ").strip().lower()
+# Autokey Cipher Decryption
+def autokey_decode(P, key):
+    """
+    Decrypts a ciphertext string using the Autokey cipher.
 
-            if operation == 'e':
-                result = vigenere_encrypt(text, key)
-                print("Encrypted Message:", result)
-            elif operation == 'd':
-                text = preprocess_text(text)
-                result = vigenere_decrypt(text, key)
-                print("Decrypted Message:", result)
-            else:
-                print("Invalid operation.")
-
-        elif choice == '2':
-            print("\n--- Autokey Cipher ---")
-            text = input("Enter your message: ")
-            try:
-                key_val = int(input("Enter initial key (0-25): "))
-                if not (0 <= key_val <= 25):
-                    raise ValueError
-            except ValueError:
-                print("Invalid key. Please enter a number from 0 to 25.")
-                continue
-
-            operation = input("Encrypt or Decrypt? (e/d): ").strip().lower()
-
-            if operation == 'e':
-                result = autokey_encrypt(text, key_val)
-                print("Encrypted Message:", result)
-            elif operation == 'd':
-                text = preprocess_text(text)
-                result = autokey_decrypt(text, key_val)
-                print("Decrypted Message:", result)
-            else:
-                print("Invalid operation.")
-
-        elif choice == '3':
-            print("Exiting. Goodbye!")
-            break
-
+    Args:
+        P (str): The ciphertext to decrypt.
+        key (int): The starting key value (0-25) used for encryption.
+    """
+    if (P[0].islower()):
+        add = 'a'
+    else:
+        add = 'A'
+    plain_Text = ""
+    # The initial key character is used to decrypt the first letter
+    k = chr(key + ord(add))
+    for i in range(len(P)):
+        if (P[i].islower()):
+            add = 'a'
         else:
-            print("Invalid choice. Please try again.")
+            add = 'A'
+        # Calculate the shift value from the current key character
+        j = ord(k) - ord(add)
+        # Decrypt the current character
+        curr = ord(P[i]) - j
+        if (add == 'a' and curr < ord('a')):
+            curr += 26
+        if (add == 'A' and curr < ord('A')):
+            curr += 26
+        # The newly decrypted character becomes the key for the next character
+        k = chr(curr)
+        plain_Text = plain_Text + k
 
+    print(plain_Text)
 
-# Run the menu
-if __name__ == "__main__":
-    menu()
+# --- Main Execution ---
+print("Plain Text:", Plain_Text)
+
+print("\nVignere Cipher with Key=dollars:")
+a = Vignere(Plain_Text, "dollars")
+print("Encoded:")
+print(a)
+print("Decoded:")
+vignere_decode(a, "dollars")
+
+print("\nAutoKey Cipher with Key=7:")
+a = autokey(Plain_Text, 7)
+print("Encoded:")
+print(a)
+print("Decoded:")
+autokey_decode(a, 7)
