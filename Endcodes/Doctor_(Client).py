@@ -1,3 +1,13 @@
+"""
+============================================================
+ Project: Doctor–Auditor Secure File Sender
+ -----------------------------------------------------------
+ Description:
+ Doctor (client) reads a text file containing details,
+ encrypts it using RSA, hashes with MD5, signs using
+ ElGamal, and sends it securely to the Auditor (server).
+ ============================================================
+"""
 import socket
 import hashlib
 import random
