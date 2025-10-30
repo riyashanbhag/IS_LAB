@@ -1,3 +1,26 @@
+"""
+
+ Description:
+ The Doctor (client) sends a text file containing patient data,
+ timestamps, and budgets to the Auditor (server).
+
+ Security Flow:
+ - File is encrypted using RSA
+ - File is hashed using MD5
+ - ElGamal digital signature ensures authenticity
+ - RSA homomorphic property allows summing encrypted budgets
+   and searching keywords without decrypting
+ -----------------------------------------------------------
+ Server Functions:
+ 1. Authenticate doctor
+ 2. Receive encrypted file
+ 3. Verify ElGamal signature
+ 4. Search doctor name / branch in ciphertext (mock demo)
+ 5. Add encrypted budgets (homomorphic)
+ ============================================================
+"""
+
+
 import socket
 import json
 import hashlib
