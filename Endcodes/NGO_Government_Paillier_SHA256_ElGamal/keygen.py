@@ -2,6 +2,11 @@
 # → Generates Paillier keypair (server) and ElGamal keypair (client).
 # → Saves files: paillier_pub.pkl, paillier_priv.pkl, elg_priv.pkl, elg_pub.pkl
 
+#--------------------------
+# run python keygen.py
+# then python server.py
+# then python client.py
+#----------------------------------
 import pickle
 from Crypto.Util.number import getPrime, inverse
 import random, math
